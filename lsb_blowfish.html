@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LSB + Blowfish Steganography</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">LSB Steganography + Blowfish</h1>
+      <p class="text-gray-600 mt-2">Sembunyikan dan ambil pesan rahasia dari gambar</p>
+    </div>
+
+    <!-- Mode Selection -->
+    <div class="mb-6">
+      <label for="mode" class="block text-sm font-medium text-gray-700 mb-2">Pilih Mode</label>
+      <div class="relative">
+        <select id="mode" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white">
+          <option value="embed">Sisipkan teks ke PNG</option>
+          <option value="extract">Ambil teks dari PNG</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Embed Section -->
+    <div id="embedSection">
+      <!-- File Input -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih gambar PNG</label>
+        <div class="flex items-center justify-center w-full">
+          <label for="coverImage" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg class="w-8 h-8 mb-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Klik untuk upload</span></p>
+              <p class="text-xs text-gray-500">PNG saja</p>
+            </div>
+            <input id="coverImage" type="file" accept="image/png" class="hidden" />
+          </label>
+        </div>
+        <p id="coverFileName" class="text-sm text-gray-500 mt-2 hidden"></p>
+      </div>
+
+      <!-- Message Input -->
+      <div class="mb-6">
+        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Teks rahasia</label>
+        <textarea id="message" placeholder="Masukkan teks yang ingin disembunyikan..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px] resize-y"></textarea>
+      </div>
+
+      <!-- Key Input -->
+      <div class="mb-6">
+        <label for="key" class="block text-sm font-medium text-gray-700 mb-2">Kunci Blowfish</label>
+        <div class="relative">
+          <input type="password" id="key" placeholder="Masukkan kunci" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+            <svg id="eyeIcon" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Embed Button -->
+      <button id="btnEmbed" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center">
+        <svg id="embedLoading" class="hidden animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span id="embedText">Sisipkan & Download</span>
+      </button>
+    </div>
+
+    <!-- Extract Section -->
+    <div id="extractSection" class="hidden">
+      <!-- File Input -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih gambar stego PNG</label>
+        <div class="flex items-center justify-center w-full">
+          <label for="stegoImage" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg class="w-8 h-8 mb-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              </svg>
+              <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Klik untuk upload</span></p>
+              <p class="text-xs text-gray-500">PNG stego saja</p>
+            </div>
+            <input id="stegoImage" type="file" accept="image/png" class="hidden" />
+          </label>
+        </div>
+        <p id="stegoFileName" class="text-sm text-gray-500 mt-2 hidden"></p>
+      </div>
+
+      <!-- Key Input -->
+      <div class="mb-6">
+        <label for="keyExtract" class="block text-sm font-medium text-gray-700 mb-2">Kunci Blowfish</label>
+        <div class="relative">
+          <input type="password" id="keyExtract" placeholder="Masukkan kunci" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          <button type="button" id="togglePasswordExtract" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+            <svg id="eyeIconExtract" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Extract Button -->
+      <button id="btnExtract" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center">
+        <svg id="extractLoading" class="hidden animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span id="extractText">Ambil & Dekripsi</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+  // Helper conversions
+  function textToBytes(str) {
+    return new TextEncoder().encode(str);
+  }
+  function bytesToText(bytes) {
+    return new TextDecoder().decode(bytes);
+  }
+
+  function base64ToBytes(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+  function bytesToBase64(bytes) {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
+
+  function downloadBlob(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+
+  // --- LSB ---
+  function embedBytes(imageData, payload) {
+    const data = imageData.data;
+    const bitsCapacity = (data.length / 4) * 3;
+    const totalBits = 32 + payload.length * 8;
+    if (totalBits > bitsCapacity) throw new Error("Gambar terlalu kecil!");
+
+    const len = payload.length >>> 0;
+    for (let i = 0; i < 32; i++) {
+      const bit = (len >>> (31 - i)) & 1;
+      const pixel = Math.floor(i / 3);
+      const channel = i % 3;
+      const idx = pixel * 4 + channel;
+      data[idx] = (data[idx] & 0xFE) | bit;
+    }
+
+    let bitCursor = 0;
+    for (let b = 0; b < payload.length; b++) {
+      for (let bit = 7; bit >= 0; bit--) {
+        const valueBit = (payload[b] >>> bit) & 1;
+        const global = 32 + bitCursor;
+        const pixel = Math.floor(global / 3);
+        const channel = global % 3;
+        const idx = pixel * 4 + channel;
+        data[idx] = (data[idx] & 0xFE) | valueBit;
+        bitCursor++;
+      }
+    }
+  }
+
+  function extractBytes(imageData) {
+    const data = imageData.data;
+    let len = 0;
+    for (let i = 0; i < 32; i++) {
+      const pixel = Math.floor(i / 3);
+      const channel = i % 3;
+      const idx = pixel * 4 + channel;
+      len = (len << 1) | (data[idx] & 1);
+    }
+
+    const payload = new Uint8Array(len);
+    let bitCursor = 0;
+    for (let b = 0; b < len; b++) {
+      let byte = 0;
+      for (let bit = 7; bit >= 0; bit--) {
+        const global = 32 + bitCursor;
+        const pixel = Math.floor(global / 3);
+        const channel = global % 3;
+        const idx = pixel * 4 + channel;
+        byte = (byte << 1) | (data[idx] & 1);
+        bitCursor++;
+      }
+      payload[b] = byte;
+    }
+    return payload;
+  }
+
+  function loadImage(file) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); res(img); };
+      img.onerror = () => rej("Gagal memuat gambar");
+      img.src = url;
+    });
+  }
+
+  // --- UI Logic ---
+  const mode = document.getElementById('mode');
+  const embedSection = document.getElementById('embedSection');
+  const extractSection = document.getElementById('extractSection');
+  
+  // Toggle mode
+  mode.onchange = () => {
+    if (mode.value === 'embed') {
+      embedSection.classList.remove('hidden');
+      extractSection.classList.add('hidden');
+    } else {
+      embedSection.classList.add('hidden');
+      extractSection.classList.remove('hidden');
+    }
+  };
+
+  // Toggle password visibility
+  document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('key');
+    const eyeIcon = document.getElementById('eyeIcon');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+    } else {
+      passwordInput.type = 'password';
+      eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+    }
+  });
+
+  document.getElementById('togglePasswordExtract').addEventListener('click', function() {
+    const passwordInput = document.getElementById('keyExtract');
+    const eyeIcon = document.getElementById('eyeIconExtract');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+    } else {
+      passwordInput.type = 'password';
+      eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+    }
+  });
+
+  // Menampilkan nama file yang dipilih
+  document.getElementById('coverImage').addEventListener('change', function(e) {
+    const fileNameDisplay = document.getElementById('coverFileName');
+    if (this.files.length > 0) {
+      fileNameDisplay.textContent = this.files[0].name;
+      fileNameDisplay.classList.remove('hidden');
+    } else {
+      fileNameDisplay.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('stegoImage').addEventListener('change', function(e) {
+    const fileNameDisplay = document.getElementById('stegoFileName');
+    if (this.files.length > 0) {
+      fileNameDisplay.textContent = this.files[0].name;
+      fileNameDisplay.classList.remove('hidden');
+    } else {
+      fileNameDisplay.classList.add('hidden');
+    }
+  });
+
+  // Embed button handler
+  document.getElementById('btnEmbed').onclick = async () => {
+    const file = document.getElementById('coverImage').files[0];
+    const msg = document.getElementById('message').value;
+    const key = document.getElementById('key').value;
+    const btnEmbed = document.getElementById('btnEmbed');
+    const embedText = document.getElementById('embedText');
+    const embedLoading = document.getElementById('embedLoading');
+    
+    if (!file || !msg || !key) return alert("Lengkapi semua input!");
+
+    // Tampilkan loading state
+    btnEmbed.disabled = true;
+    embedText.textContent = 'Menyisipkan...';
+    embedLoading.classList.remove('hidden');
+
+    try {
+      const cipher = CryptoJS.Blowfish.encrypt(msg, key).toString(); // base64
+      const cipherBytes = base64ToBytes(cipher);
+
+      const img = await loadImage(file);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      embedBytes(imageData, cipherBytes);
+      ctx.putImageData(imageData, 0, 0);
+
+      canvas.toBlob(b => {
+        downloadBlob(b, file.name.replace(/\.png$/i, '') + '_stego.png');
+        alert("Pesan berhasil disisipkan!");
+      }, 'image/png');
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan: " + err.message);
+    } finally {
+      // Reset loading state
+      btnEmbed.disabled = false;
+      embedText.textContent = 'Sisipkan & Download';
+      embedLoading.classList.add('hidden');
+    }
+  };
+
+  // Extract button handler
+  document.getElementById('btnExtract').onclick = async () => {
+    const file = document.getElementById('stegoImage').files[0];
+    const key = document.getElementById('keyExtract').value;
+    const btnExtract = document.getElementById('btnExtract');
+    const extractText = document.getElementById('extractText');
+    const extractLoading = document.getElementById('extractLoading');
+    
+    if (!file || !key) return alert("Lengkapi input!");
+
+    // Tampilkan loading state
+    btnExtract.disabled = true;
+    extractText.textContent = 'Mengambil...';
+    extractLoading.classList.remove('hidden');
+
+    try {
+      const img = await loadImage(file);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const bytes = extractBytes(data);
+      const base64Cipher = bytesToBase64(bytes);
+
+      const decrypted = CryptoJS.Blowfish.decrypt(base64Cipher, key).toString(CryptoJS.enc.Utf8);
+      if (!decrypted) throw new Error();
+      downloadBlob(new Blob([decrypted], { type: 'text/plain' }), 'hasil_dekripsi.txt');
+      alert("Dekripsi berhasil! File disimpan sebagai hasil_dekripsi.txt");
+    } catch {
+      alert("Dekripsi gagal — kunci salah atau gambar tidak valid.");
+    } finally {
+      // Reset loading state
+      btnExtract.disabled = false;
+      extractText.textContent = 'Ambil & Dekripsi';
+      extractLoading.classList.add('hidden');
+    }
+  };
+  </script>
+</body>
+</html>

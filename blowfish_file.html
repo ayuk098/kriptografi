@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Blowfish File Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">Blowfish File Tool</h1>
+      <p class="text-gray-600 mt-2">Enkripsi dan dekripsi file dengan mudah</p>
+    </div>
+
+    <!-- Form -->
+    <form id="cryptoForm">
+      <!-- Mode Selection -->
+      <div class="mb-6">
+        <label for="mode" class="block text-sm font-medium text-gray-700 mb-2">Mode</label>
+        <div class="relative">
+          <select id="mode" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white">
+            <option value="encrypt">Enkripsi File</option>
+            <option value="decrypt">Dekripsi File</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Input -->
+      <div class="mb-6">
+        <label for="fileInput" class="block text-sm font-medium text-gray-700 mb-2">Pilih File</label>
+        <div class="flex items-center justify-center w-full">
+          <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg class="w-8 h-8 mb-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Klik untuk upload</span> atau drag & drop</p>
+              <p class="text-xs text-gray-500">File apa saja</p>
+            </div>
+            <input id="fileInput" type="file" class="hidden" required />
+          </label>
+        </div>
+        <p id="fileName" class="text-sm text-gray-500 mt-2 hidden"></p>
+      </div>
+
+      <!-- Key Input -->
+      <div class="mb-6">
+        <label for="keyInput" class="block text-sm font-medium text-gray-700 mb-2">Kunci (Password)</label>
+        <div class="relative">
+          <input type="password" id="keyInput" placeholder="Masukkan kunci" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+          <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+            <svg id="eyeIcon" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center">
+        <svg id="loadingSpinner" class="hidden animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span id="buttonText">Proses</span>
+      </button>
+    </form>
+
+    <!-- Info Text -->
+    <p class="text-sm text-gray-500 text-center mt-6">
+      File akan otomatis diunduh setelah proses selesai.
+    </p>
+  </div>
+
+  <script>
+    // Fungsi untuk konversi ArrayBuffer ke Base64
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      return btoa(binary);
+    }
+
+    // Fungsi untuk konversi Base64 ke Uint8Array
+    function base64ToUint8Array(base64) {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes;
+    }
+
+    // Fungsi untuk mengunduh file
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('keyInput');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+      }
+    });
+
+    // Menampilkan nama file yang dipilih
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const fileNameDisplay = document.getElementById('fileName');
+      if (this.files.length > 0) {
+        fileNameDisplay.textContent = this.files[0].name;
+        fileNameDisplay.classList.remove('hidden');
+      } else {
+        fileNameDisplay.classList.add('hidden');
+      }
+    });
+
+    // Form submission
+    document.getElementById('cryptoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const mode = document.getElementById('mode').value;
+      const file = document.getElementById('fileInput').files[0];
+      const key = document.getElementById('keyInput').value;
+      const submitBtn = document.getElementById('submitBtn');
+      const buttonText = document.getElementById('buttonText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
+      if (!file || !key) {
+        alert('Harap pilih file dan isi kunci.');
+        return;
+      }
+
+      // Tampilkan loading state
+      submitBtn.disabled = true;
+      buttonText.textContent = mode === 'encrypt' ? 'Mengenkripsi...' : 'Mendekripsi...';
+      loadingSpinner.classList.remove('hidden');
+
+      try {
+        if (mode === 'encrypt') {
+          // 🔹 ENKRIPSI
+          const arrayBuffer = await file.arrayBuffer();
+          const base64 = arrayBufferToBase64(arrayBuffer);
+          const encrypted = CryptoJS.Blowfish.encrypt(base64, key).toString();
+
+          const payload = {
+            filename: file.name,
+            mime: file.type || 'application/octet-stream',
+            ciphertext: encrypted
+          };
+
+          const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+          downloadBlob(blob, file.name + '.enc');
+          alert('Enkripsi selesai! File .enc telah diunduh.');
+
+        } else {
+          // 🔹 DEKRIPSI
+          const text = await file.text();
+          const payload = JSON.parse(text);
+          const decryptedBase64 = CryptoJS.Blowfish.decrypt(payload.ciphertext, key).toString(CryptoJS.enc.Utf8);
+
+          if (!decryptedBase64) {
+            alert('Kunci salah atau file rusak!');
+            return;
+          }
+
+          const bytes = base64ToUint8Array(decryptedBase64);
+          const blob = new Blob([bytes], { type: payload.mime });
+          downloadBlob(blob, payload.filename);
+          alert('Dekripsi selesai! File asli telah diunduh.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Terjadi kesalahan: ' + err.message);
+      } finally {
+        // Reset loading state
+        submitBtn.disabled = false;
+        buttonText.textContent = 'Proses';
+        loadingSpinner.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
