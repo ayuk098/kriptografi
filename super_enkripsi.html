@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Super Enkripsi — Caesar + Rail Fence + XOR</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #f0f6ff 0%, #e8f0ff 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #0f172a;
+    }
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+      padding: 28px;
+      text-align: center;
+    }
+    .icon {
+      font-size: 42px;
+      color: #2563eb;
+      background: #eff6ff;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+    h2 {
+      font-size: 22px;
+      margin: 0;
+      color: #1e293b;
+      font-weight: 700;
+    }
+    p.sub {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+    textarea,
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    textarea:focus,
+    input:focus {
+      border-color: #2563eb;
+    }
+    textarea {
+      resize: vertical;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+    .btn:hover {
+      background: #1d4ed8;
+    }
+    .btn.secondary {
+      background: #94a3b8;
+    }
+    .btn.secondary:hover {
+      background: #64748b;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    pre {
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: left;
+      min-height: 80px;
+      font-size: 13px;
+      overflow-wrap: break-word;
+    }
+    .copy-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+    .copy-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover {
+      background: #1d4ed8;
+    }
+    small {
+      font-size: 12px;
+      color: #64748b;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">🔒</div>
+    <h2>Super Enkripsi</h2>
+    <p class="sub">Caesar → Rail Fence → XOR</p>
+
+    <label for="plaintext">Teks</label>
+    <textarea id="plaintext" rows="4" placeholder="Masukkan teks..."></textarea>
+
+    <label for="caesarShift">Caesar Shift</label>
+    <input id="caesarShift" type="number" value="3" />
+
+    <label for="railKey">Rail Fence (Jumlah rel)</label>
+    <input id="railKey" type="number" min="2" value="3" />
+
+    <label for="xorKey">XOR Key</label>
+    <input id="xorKey" type="text" value="kunci" />
+
+    <div class="btn-group">
+      <button id="encryptBtn" class="btn">Enkripsi</button>
+      <button id="decryptBtn" class="btn secondary">Dekripsi</button>
+    </div>
+
+    <button id="clearBtn" class="btn secondary" style="margin-bottom:14px;">Bersihkan</button>
+
+    <label for="output">Output</label>
+    <pre id="output"></pre>
+    <div class="copy-container">
+      <button id="copyBtn" class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <script>
+    function mod(n,m){return ((n % m) + m) % m}
+    function toBase64(str){return btoa(unescape(encodeURIComponent(str)))}
+    function fromBase64(b64){return decodeURIComponent(escape(atob(b64)))}
+
+    function caesarEncrypt(text, shift){
+      shift = mod(Number(shift) || 0, 26);
+      return Array.from(text).map(ch => {
+        const code = ch.charCodeAt(0);
+        if(code >= 65 && code <= 90){return String.fromCharCode(65 + mod(code - 65 + shift, 26));}
+        if(code >= 97 && code <= 122){return String.fromCharCode(97 + mod(code - 97 + shift, 26));}
+        return ch;
+      }).join('');
+    }
+    function caesarDecrypt(text, shift){return caesarEncrypt(text, -Number(shift) || 0);}
+
+    function railFenceEncrypt(text, rails){
+      rails = Math.max(2, parseInt(rails) || 2);
+      const rows = Array.from({length: rails}, () => []);
+      let r = 0, dir = 1;
+      for (const ch of text){
+        rows[r].push(ch);
+        r += dir;
+        if(r === rails-1) dir = -1;
+        if(r === 0) dir = 1;
+      }
+      return rows.map(row => row.join('')).join('');
+    }
+
+    function railFenceDecrypt(cipher, rails){
+      rails = Math.max(2, parseInt(rails) || 2);
+      const len = cipher.length;
+      const pattern = [];
+      let r = 0, dir = 1;
+      for(let i=0;i<len;i++){
+        pattern.push(r);
+        r += dir;
+        if(r === rails-1) dir = -1;
+        if(r === 0) dir = 1;
+      }
+      const counts = Array.from({length: rails}, () => 0);
+      for(const p of pattern) counts[p]++;
+      const rows = [];
+      let idx = 0;
+      for(let i=0;i<rails;i++){
+        rows[i] = cipher.slice(idx, idx + counts[i]).split('');
+        idx += counts[i];
+      }
+      let result = '';
+      for(const p of pattern){result += rows[p].shift();}
+      return result;
+    }
+
+    function xorWithKeyToBase64(text, key){
+      if(!key) return toBase64(text);
+      const t = Array.from(unescape(encodeURIComponent(text))).map(c=>c.charCodeAt(0));
+      const k = Array.from(unescape(encodeURIComponent(key))).map(c=>c.charCodeAt(0));
+      const out = t.map((b,i)=>String.fromCharCode(b ^ k[i % k.length])).join('');
+      return toBase64(out);
+    }
+    function xorFromBase64(b64, key){
+      const raw = fromBase64(b64);
+      if(!key) return raw;
+      const t = Array.from(raw).map(c=>c.charCodeAt(0));
+      const k = Array.from(unescape(encodeURIComponent(key))).map(c=>c.charCodeAt(0));
+      const out = t.map((b,i)=>String.fromCharCode(b ^ k[i % k.length])).join('');
+      return decodeURIComponent(escape(out));
+    }
+
+    function encryptFixed(text, settings){
+      let cur = text;
+      cur = caesarEncrypt(cur, settings.shift);
+      cur = railFenceEncrypt(cur, settings.rails);
+      cur = xorWithKeyToBase64(cur, settings.xorKey);
+      return cur;
+    }
+
+    function decryptFixed(text, settings){
+      let cur = text;
+      cur = xorFromBase64(cur, settings.xorKey);
+      cur = railFenceDecrypt(cur, settings.rails);
+      cur = caesarDecrypt(cur, settings.shift);
+      return cur;
+    }
+
+    const pt = document.getElementById('plaintext');
+    const out = document.getElementById('output');
+    const shiftInput = document.getElementById('caesarShift');
+    const railsInput = document.getElementById('railKey');
+    const xorInput = document.getElementById('xorKey');
+
+    document.getElementById('encryptBtn').addEventListener('click', ()=>{
+      const settings = {shift: shiftInput.value, rails: railsInput.value, xorKey: xorInput.value};
+      try{
+        const cipher = encryptFixed(pt.value, settings);
+        out.textContent = cipher;
+      }catch(e){out.textContent = 'Error: ' + e.message;}
+    });
+
+    document.getElementById('decryptBtn').addEventListener('click', ()=>{
+      const settings = {shift: shiftInput.value, rails: railsInput.value, xorKey: xorInput.value};
+      try{
+        const plain = decryptFixed(out.textContent || pt.value, settings);
+        out.textContent = plain;
+      }catch(e){out.textContent = 'Error: ' + e.message;}
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{pt.value='';out.textContent='';});
+
+    // tombol copy
+    document.getElementById('copyBtn').addEventListener('click', ()=>{
+      if(out.textContent.trim() === '') return;
+      navigator.clipboard.writeText(out.textContent).then(()=>{
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.style.background = '#16a34a';
+        setTimeout(()=>{
+          btn.textContent = 'Copy';
+          btn.style.background = '#2563eb';
+        }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
