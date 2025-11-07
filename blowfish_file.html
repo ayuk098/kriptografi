@@ -15,12 +15,11 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-    <!-- Header -->
+<body class="bg-gradient-to-br from-pink-50 to-rose-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-8 border border-pink-100">
     <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
@@ -28,13 +27,11 @@
       <p class="text-gray-600 mt-2">Enkripsi dan dekripsi file dengan mudah</p>
     </div>
 
-    <!-- Form -->
     <form id="cryptoForm">
-      <!-- Mode Selection -->
       <div class="mb-6">
         <label for="mode" class="block text-sm font-medium text-gray-700 mb-2">Mode</label>
         <div class="relative">
-          <select id="mode" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white">
+          <select id="mode" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 appearance-none bg-white transition">
             <option value="encrypt">Enkripsi File</option>
             <option value="decrypt">Dekripsi File</option>
           </select>
@@ -46,11 +43,10 @@
         </div>
       </div>
 
-      <!-- File Input -->
       <div class="mb-6">
         <label for="fileInput" class="block text-sm font-medium text-gray-700 mb-2">Pilih File</label>
         <div class="flex items-center justify-center w-full">
-          <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+          <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-pink-50 transition-colors">
             <div class="flex flex-col items-center justify-center pt-5 pb-6">
               <svg class="w-8 h-8 mb-3 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -61,15 +57,15 @@
             <input id="fileInput" type="file" class="hidden" required />
           </label>
         </div>
-        <p id="fileName" class="text-sm text-gray-500 mt-2 hidden"></p>
+        <p id="fileName" class="text-sm text-gray-500 mt-2 text-center"></p>
       </div>
 
-      <!-- Key Input -->
+
       <div class="mb-6">
         <label for="keyInput" class="block text-sm font-medium text-gray-700 mb-2">Kunci (Password)</label>
         <div class="relative">
-          <input type="password" id="keyInput" placeholder="Masukkan kunci" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
-          <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+          <input type="password" id="keyInput" placeholder="Masukkan kunci rahasia" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition" required />
+          <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-pink-600 transition">
             <svg id="eyeIcon" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -78,24 +74,29 @@
         </div>
       </div>
 
-      <!-- Submit Button -->
-      <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center">
+      <button type="submit" id="submitBtn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 px-4 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 flex items-center justify-center">
         <svg id="loadingSpinner" class="hidden animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span id="buttonText">Proses</span>
+        <span id="buttonText">Mulai Proses</span>
       </button>
     </form>
 
-    <!-- Info Text -->
-    <p class="text-sm text-gray-500 text-center mt-6">
-      File akan otomatis diunduh setelah proses selesai.
-    </p>
+    <div class="mt-6 p-4 bg-pink-50 rounded-lg border border-pink-200">
+      <div class="flex items-start">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-500 mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </svg>
+        <p class="text-sm text-pink-700">
+          File akan otomatis diunduh setelah proses selesai. 
+          Gunakan algoritma Blowfish untuk keamanan optimal.
+        </p>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Fungsi untuk konversi ArrayBuffer ke Base64
     function arrayBufferToBase64(buffer) {
       const bytes = new Uint8Array(buffer);
       let binary = "";
@@ -106,7 +107,6 @@
       return btoa(binary);
     }
 
-    // Fungsi untuk konversi Base64 ke Uint8Array
     function base64ToUint8Array(base64) {
       const binary = atob(base64);
       const bytes = new Uint8Array(binary.length);
@@ -116,7 +116,6 @@
       return bytes;
     }
 
-    // Fungsi untuk mengunduh file
     function downloadBlob(blob, filename) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -126,7 +125,6 @@
       URL.revokeObjectURL(url);
     }
 
-    // Toggle password visibility
     document.getElementById('togglePassword').addEventListener('click', function() {
       const passwordInput = document.getElementById('keyInput');
       const eyeIcon = document.getElementById('eyeIcon');
@@ -140,18 +138,17 @@
       }
     });
 
-    // Menampilkan nama file yang dipilih
     document.getElementById('fileInput').addEventListener('change', function(e) {
       const fileNameDisplay = document.getElementById('fileName');
       if (this.files.length > 0) {
-        fileNameDisplay.textContent = this.files[0].name;
-        fileNameDisplay.classList.remove('hidden');
+        fileNameDisplay.textContent = `File terpilih: ${this.files[0].name}`;
+        fileNameDisplay.classList.add('text-pink-600', 'font-medium');
       } else {
-        fileNameDisplay.classList.add('hidden');
+        fileNameDisplay.textContent = '';
+        fileNameDisplay.classList.remove('text-pink-600', 'font-medium');
       }
     });
 
-    // Form submission
     document.getElementById('cryptoForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -163,18 +160,16 @@
       const loadingSpinner = document.getElementById('loadingSpinner');
 
       if (!file || !key) {
-        alert('Harap pilih file dan isi kunci.');
+        alert('Harap pilih file dan isi kunci terlebih dahulu.');
         return;
       }
 
-      // Tampilkan loading state
       submitBtn.disabled = true;
       buttonText.textContent = mode === 'encrypt' ? 'Mengenkripsi...' : 'Mendekripsi...';
       loadingSpinner.classList.remove('hidden');
 
       try {
         if (mode === 'encrypt') {
-          // 🔹 ENKRIPSI
           const arrayBuffer = await file.arrayBuffer();
           const base64 = arrayBufferToBase64(arrayBuffer);
           const encrypted = CryptoJS.Blowfish.encrypt(base64, key).toString();
@@ -209,9 +204,8 @@
         console.error(err);
         alert('Terjadi kesalahan: ' + err.message);
       } finally {
-        // Reset loading state
         submitBtn.disabled = false;
-        buttonText.textContent = 'Proses';
+        buttonText.textContent = 'Mulai Proses';
         loadingSpinner.classList.add('hidden');
       }
     });

@@ -22,24 +22,22 @@ $email = htmlspecialchars($_SESSION['email_user']);
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-pink-50 to-rose-100 min-h-screen flex flex-col">
 
-  <!-- Navbar -->
-  <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-    <div class="text-xl font-semibold text-blue-700">Kriptografi</div>
+  <nav class="bg-white shadow-sm px-6 py-4 flex justify-between items-center border-b border-pink-100">
+    <div class="text-xl font-semibold text-pink-600">Kriptografi</div>
     <div class="text-gray-700">
-      Hai, <span class="font-medium text-blue-600"><?php echo $email; ?></span>
+      Hai, <span class="font-medium text-pink-600"><?php echo $email; ?></span>
     </div>
   </nav>
 
-  <!-- Main Content -->
+
   <main class="flex-grow flex items-center justify-center p-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-3xl">
 
-      <!-- Menu 1: Dashboard -->
-      <a href="aes_hmac.html" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-100">
+      <a href="aes_hmac.html" class="group bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-pink-100 hover:border-pink-200">
         <div class="flex items-center space-x-4">
-          <div class="bg-blue-100 p-3 rounded-lg text-blue-600">
+          <div class="bg-pink-100 p-3 rounded-lg text-pink-600 group-hover:bg-pink-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6m-6 4v6m-6-6v6m12-6v6" />
@@ -47,15 +45,15 @@ $email = htmlspecialchars($_SESSION['email_user']);
           </div>
           <div>
             <h2 class="text-lg font-semibold text-gray-800">Database</h2>
-            <p class="text-gray-500 text-sm">Lihat ringkasan data & aktivitas Anda</p>
+            <p class="text-gray-500 text-sm">Enkripsi data database</p>
           </div>
         </div>
       </a>
 
-      <!-- Menu 2: Profil -->
-      <a href="blowfish_file.html" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-100">
+
+      <a href="blowfish_file.html" class="group bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-pink-100 hover:border-pink-200">
         <div class="flex items-center space-x-4">
-          <div class="bg-green-100 p-3 rounded-lg text-green-600">
+          <div class="bg-purple-100 p-3 rounded-lg text-purple-600 group-hover:bg-purple-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M5.121 17.804A9 9 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -63,15 +61,14 @@ $email = htmlspecialchars($_SESSION['email_user']);
           </div>
           <div>
             <h2 class="text-lg font-semibold text-gray-800">File</h2>
-            <p class="text-gray-500 text-sm">Kelola informasi akun Anda</p>
+            <p class="text-gray-500 text-sm">Enkripsi file dokumen</p>
           </div>
         </div>
       </a>
 
-      <!-- Menu 3: Data -->
-      <a href="lsb_blowfish.html" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-100">
+      <a href="lsb_blowfish.html" class="group bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-pink-100 hover:border-pink-200">
         <div class="flex items-center space-x-4">
-          <div class="bg-yellow-100 p-3 rounded-lg text-yellow-600">
+          <div class="bg-blue-100 p-3 rounded-lg text-blue-600 group-hover:bg-blue-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 7h18M3 12h18M3 17h18" />
@@ -79,31 +76,29 @@ $email = htmlspecialchars($_SESSION['email_user']);
           </div>
           <div>
             <h2 class="text-lg font-semibold text-gray-800">Gambar</h2>
-            <p class="text-gray-500 text-sm">Akses data pengguna atau laporan</p>
+            <p class="text-gray-500 text-sm">Enkripsi file gambar</p>
           </div>
         </div>
       </a>
 
-    <!-- Menu 3: Data -->
-      <a href="super_enkripsi.html" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-100">
+      <a href="super_enkripsi.html" class="group bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-pink-100 hover:border-pink-200">
         <div class="flex items-center space-x-4">
-          <div class="bg-yellow-100 p-3 rounded-lg text-yellow-600">
+          <div class="bg-green-100 p-3 rounded-lg text-green-600 group-hover:bg-green-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 7h18M3 12h18M3 17h18" />
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
           <div>
             <h2 class="text-lg font-semibold text-gray-800">Super Enkripsi</h2>
-            <p class="text-gray-500 text-sm">Akses data pengguna atau laporan</p>
+            <p class="text-gray-500 text-sm">Enkripsi berlapis</p>
           </div>
         </div>
       </a>
 
-      <!-- Menu 4: Logout -->
-      <a href="logout.php" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-100">
+      <a href="logout.php" class="group bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border border-pink-100 hover:border-pink-200">
         <div class="flex items-center space-x-4">
-          <div class="bg-red-100 p-3 rounded-lg text-red-600">
+          <div class="bg-red-100 p-3 rounded-lg text-red-600 group-hover:bg-red-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />

@@ -7,51 +7,67 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-blue-50 font-sans min-h-screen p-6">
-  <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Database (AES + HMAC)</h1>
+<body class="bg-gradient-to-br from-pink-50 to-rose-100 font-sans min-h-screen p-6">
+  
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h1 class="text-3xl font-bold text-pink-600 mb-2">Database (AES + HMAC)</h1>
+    <p class="text-gray-600">Enkripsi data sensitif dengan algoritma AES dan HMAC</p>
+  </div>
 
-  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
-    <div class="grid md:grid-cols-2 gap-4">
+  <!-- Main Card -->
+  <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-md p-6 border border-pink-100">
+    
+    <!-- Input Form -->
+    <div class="grid md:grid-cols-2 gap-4 mb-6">
       <div>
-        <label class="font-semibold text-gray-700">Nama</label>
-        <input id="nama" type="text" placeholder="Masukkan nama..." class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        <label class="font-semibold text-gray-700 block mb-2">Nama</label>
+        <input id="nama" type="text" placeholder="Masukkan nama..." 
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition">
       </div>
 
       <div>
-        <label class="font-semibold text-gray-700">Email</label>
-        <input id="email" type="email" placeholder="Masukkan email..." class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        <label class="font-semibold text-gray-700 block mb-2">Email</label>
+        <input id="email" type="email" placeholder="Masukkan email..." 
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition">
       </div>
 
       <div>
-        <label class="font-semibold text-gray-700">NIK</label>
-        <input id="nik" type="text" placeholder="Masukkan NIK..." class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        <label class="font-semibold text-gray-700 block mb-2">NIK</label>
+        <input id="nik" type="text" placeholder="Masukkan NIK..." 
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition">
       </div>
 
       <div>
-        <label class="font-semibold text-gray-700">Kunci Enkripsi</label>
-        <input id="key" type="text" placeholder="Masukkan kunci rahasia..." class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        <label class="font-semibold text-gray-700 block mb-2">Kunci Enkripsi</label>
+        <input id="key" type="text" placeholder="Masukkan kunci rahasia..." 
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition">
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-3 mt-6">
-      <button onclick="encryptAndStore()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+    <!-- Buttons -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <button onclick="encryptAndStore()" 
+              class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-3 rounded-lg transition font-medium">
         Enkripsi & Simpan
       </button>
-      <button onclick="decryptLatest()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+      <button onclick="decryptLatest()" 
+              class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-lg transition font-medium">
         Dekripsi NIK
       </button>
     </div>
 
+    <!-- Table -->
     <div class="overflow-x-auto mt-8">
       <table class="min-w-full border border-gray-200 text-sm">
-        <thead class="bg-blue-100 text-blue-700">
+        <thead class="bg-pink-100 text-pink-700">
           <tr>
-            <th class="p-2 border">ID</th>
-            <th class="p-2 border">Nama</th>
-            <th class="p-2 border">Email</th>
-            <th class="p-2 border">NIK (Enkripsi)</th>
-            <th class="p-2 border">HMAC</th>
-            <th class="p-2 border">Aksi</th>
+            <th class="p-3 border font-semibold">ID</th>
+            <th class="p-3 border font-semibold">Nama</th>
+            <th class="p-3 border font-semibold">Email</th>
+            <th class="p-3 border font-semibold">NIK (Enkripsi)</th>
+            <th class="p-3 border font-semibold">HMAC</th>
+            <th class="p-3 border font-semibold">Aksi</th>
           </tr>
         </thead>
         <tbody id="dataTable" class="bg-white"></tbody>
@@ -67,7 +83,7 @@
       const key = document.getElementById("key").value.trim();
 
       if (!nama || !email || !nik || !key) {
-        alert("Isi semua data dan kunci terlebih dahulu!");
+        alert("Harap isi semua data dan kunci terlebih dahulu!");
         return;
       }
 
@@ -78,8 +94,13 @@
       existing.push({ nama, email, ciphertext, hmac });
       localStorage.setItem("dataEncrypted", JSON.stringify(existing));
 
-      alert("Data berhasil disimpan!");
+      alert("Data berhasil disimpan dan dienkripsi!");
       loadTable();
+      
+      // Clear input fields
+      document.getElementById("nama").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("nik").value = "";
     }
 
     function decryptLatest() {
@@ -132,14 +153,17 @@
 
       stored.forEach((item, index) => {
         const row = `
-          <tr class="border-b hover:bg-blue-50 transition">
-            <td class="p-2 border">${index + 1}</td>
-            <td class="p-2 border">${item.nama}</td>
-            <td class="p-2 border">${item.email}</td>
-            <td class="p-2 border text-gray-600 break-all">${item.ciphertext}</td>
-            <td class="p-2 border text-gray-600 break-all">${item.hmac}</td>
-            <td class="p-2 border text-center">
-              <button onclick="deleteData(${index})" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition text-sm">🗑️</button>
+          <tr class="border-b hover:bg-pink-50 transition">
+            <td class="p-3 border text-center">${index + 1}</td>
+            <td class="p-3 border">${item.nama}</td>
+            <td class="p-3 border">${item.email}</td>
+            <td class="p-3 border text-gray-600 text-xs break-all font-mono">${item.ciphertext.substring(0, 50)}...</td>
+            <td class="p-3 border text-gray-600 text-xs break-all font-mono">${item.hmac.substring(0, 50)}...</td>
+            <td class="p-3 border text-center">
+              <button onclick="deleteData(${index})" 
+                      class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition text-sm">
+                🗑️ Hapus
+              </button>
             </td>
           </tr>
         `;
@@ -147,6 +171,7 @@
       });
     }
 
+    // Load table when page opens
     loadTable();
   </script>
 </body>
